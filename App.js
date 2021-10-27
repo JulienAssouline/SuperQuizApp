@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 2, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 1,
+    elevation: 5,
   },
   icons: {
     position: 'absolute',
