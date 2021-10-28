@@ -55,13 +55,16 @@ const App = () => {
           if (data[page].answer === selected) {
             setScore(score + 1);
           }
+
+          // wait a couple of seconds before going to the next question
           setTimeout(() => {
-            setTimeCounter(calculateTimeLeft(11));
             if (page < 2) {
               setPage(page + 1);
             } else if (page === 2) {
               setQuizCompleted(true);
             }
+
+            setTimeCounter(calculateTimeLeft(11));
             setIsPlaying(true);
             setAnswer(null);
             setSelected(null);
@@ -88,12 +91,12 @@ const App = () => {
   };
 
   const highlightBackground = answerNumber => {
-    if (isOutOfTime(answerNumber)) return 'green';
+    if (isOutOfTime(answerNumber)) return '#008000';
     if (selected === null) return '#793f83';
     if (answer === null) {
       return selected === answerNumber ? 'purple' : '#793f83';
     } else {
-      return isAnswerCorrect(answerNumber, 'green', 'red', '#793f83');
+      return isAnswerCorrect(answerNumber, '#008000', '#FF0000', '#793f83');
     }
   };
 

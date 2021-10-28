@@ -36,7 +36,7 @@ const DonutChart = ({score}) => {
   ]);
 
   const findColor = value => {
-    if (Math.round(value) === 100) return '#00FF00';
+    if (Math.round(value) === 100) return '#008000';
     if (Math.round(value) === 67) return '#FFA500';
     if (Math.round(value) === 33) return '#FF0000';
     return '#D3D3D3';
