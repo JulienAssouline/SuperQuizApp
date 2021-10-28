@@ -8,7 +8,7 @@ const DonutChart = ({score}) => {
   const h = 400;
 
   const margin = {
-    top: 10,
+    top: 40,
     bottom: 10,
     right: 40,
     left: 35,

@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   ScrollView,
   Text,
@@ -22,23 +22,57 @@ import {faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {CountdownCircleTimer} from 'react-native-countdown-circle-timer';
 
 import {useQuery} from './src/hooks/useQuery';
-import {useTimer} from './src/hooks/useTimer';
 import QuizCompleted from './src/components/QuizCompleted';
 import CustomStatusBar from './src/components/CustomStatusBar';
 
 const w = Dimensions.get('window');
 
+const calculateTimeLeft = time => {
+  if (time === 0) return 0;
+  return time - 1;
+};
+
 const App = () => {
   const {data, loading, error} = useQuery();
   const [selected, setSelected] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
-  const {page, quizCompleted, answer, score, isPlaying, timeCounter} = useTimer(
-    {
-      data,
-      selected,
-      setSelected,
-    },
-  );
+
+  const [timeCounter, setTimeCounter] = useState(10);
+  const [page, setPage] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [answer, setAnswer] = useState(null);
+  const [score, setScore] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  useEffect(() => {
+    let timer;
+    if (!quizCompleted) {
+      timer = setTimeout(() => {
+        if (timeCounter === 0) {
+          setAnswer(data[page].answer);
+          setIsPlaying(false);
+
+          if (data[page].answer === selected) {
+            setScore(score + 1);
+          }
+          setTimeout(() => {
+            setTimeCounter(calculateTimeLeft(11));
+            if (page < 2) {
+              setPage(page + 1);
+            } else if (page === 2) {
+              setQuizCompleted(true);
+            }
+            setIsPlaying(true);
+            setAnswer(null);
+            setSelected(null);
+          }, 2000);
+        } else {
+          setTimeCounter(calculateTimeLeft(timeCounter));
+        }
+      }, 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [timeCounter]);
 
   const isOutOfTime = answerNumber =>
     selected === null && timeCounter === 0 && answer === answerNumber;
@@ -88,7 +122,16 @@ const App = () => {
     <View style={styles.main}>
       <CustomStatusBar />
       {quizCompleted ? (
-        <QuizCompleted score={score} />
+        <QuizCompleted
+          handleReset={() => {
+            setPage(0);
+            setScore(0);
+            setTimeCounter(10);
+            setQuizCompleted(false);
+            setAnswer(null);
+          }}
+          score={score}
+        />
       ) : (
         <ScrollView contentInsetAdjustmentBehavior="automatic">
           <View style={{textAligned: 'right'}}>
@@ -117,7 +160,7 @@ const App = () => {
                   ['#F7B801', 0.4],
                   ['#A30000', 0.2],
                 ]}
-                onComplete={() => [true, 3000]}>
+                onComplete={() => [isPlaying, 3000]}>
                 {({remainingTime}) => (
                   <Animated.Text style={{...styles.text, color: '#000000'}}>
                     {remainingTime}
